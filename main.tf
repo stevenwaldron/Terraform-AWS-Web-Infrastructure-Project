@@ -11,6 +11,10 @@ resource "aws_subnet" "public1" {
   cidr_block              = "10.0.0.0/24"
   availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
+
+  tags = {
+    Name = "Public Subnet 1"
+  }
 }
 
 resource "aws_subnet" "public2" {
@@ -18,10 +22,18 @@ resource "aws_subnet" "public2" {
   cidr_block              = "10.0.1.0/24"
   availability_zone       = "us-east-1b"
   map_public_ip_on_launch = true
+
+  tags = {
+    Name = "Public Subnet 2"
+  }
 }
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "Internet Gateway"
+  }
 }
 
 resource "aws_route_table" "RT" {
@@ -30,6 +42,10 @@ resource "aws_route_table" "RT" {
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.igw.id
+  }
+
+  tags = {
+    Name = "Public Route Table"
   }
 }
 
@@ -84,6 +100,9 @@ resource "aws_instance" "webserver1" {
   subnet_id              = aws_subnet.public1.id
   user_data_base64       = base64encode(file("userdata.sh"))
 
+  tags = {
+    Name = "Web Server 1"
+  }
 }
 
 resource "aws_instance" "webserver2" {
@@ -93,6 +112,9 @@ resource "aws_instance" "webserver2" {
   subnet_id              = aws_subnet.public2.id
   user_data_base64       = base64encode(file("userdata1.sh"))
 
+  tags = {
+    Name = "Web Server 2"
+  }
 }
 
 resource "aws_lb" "myalb" {
@@ -104,7 +126,7 @@ resource "aws_lb" "myalb" {
   subnets         = [aws_subnet.public1.id, aws_subnet.public2.id]
 
   tags = {
-    Name = "webalb"
+    Name = "Web alb"
   }
 }
 
